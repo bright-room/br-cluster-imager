@@ -1,1 +1,4 @@
-/.idea/
+.idea/
+generated/
+*.iml
+.DS_Store
