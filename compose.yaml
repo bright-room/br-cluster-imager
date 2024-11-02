@@ -32,7 +32,7 @@ x-image-builder-template: &image-builder-template
     - ./generated/cloud-config:/build/cloud-config
     - ./generated/.packer_cache:/build/.packer_cache
     - ./generated/images:/build/generated
-    - ./provisioner:/build/packer
+    - ./packer:/build/packer
   command: >
     build --var-file=packer/br-gateway1.pkrvars.hcl packer/
   privileged: true
