@@ -6,7 +6,7 @@ source "arm" "ubuntu_rpi" {
   file_unarchive_cmd    = ["xz", "--decompress", "$ARCHIVE_PATH"]
   image_build_method    = "reuse"
   image_path            = "/build/generated/${var.hostname}.img"
-  image_size            = "3.1G"
+  image_size            = "3.7G"
   image_type            = "dos"
   image_partitions {
     name         = "boot"
