@@ -1,0 +1,43 @@
+x-prod-image-builder-template: &prod-image-builder-template
+  image: mkaczanowski/packer-builder-arm:latest
+  volumes:
+    - /dev:/dev
+    - ./cloud-init/.generated/prod:/build/cloud-init
+    - ./.generated/.packer_cache:/build/.packer_cache
+    - ./.generated/images/prod:/build/generated
+    - ./packer:/build/packer
+  privileged: true
+
+services:
+  prod-gateway1-image-builder:
+    <<: *prod-image-builder-template
+    command: >
+      build --var-file=packer/br-gateway1.pkrvars.hcl packer/
+  prod-node1-image-builder:
+    <<: *prod-image-builder-template
+    command: >
+      build --var-file=packer/br-node1.pkrvars.hcl packer/
+  prod-node2-image-builder:
+    <<: *prod-image-builder-template
+    command: >
+      build --var-file=packer/br-node2.pkrvars.hcl packer/
+  prod-node3-image-builder:
+    <<: *prod-image-builder-template
+    command: >
+      build --var-file=packer/br-node3.pkrvars.hcl packer/
+  prod-node4-image-builder:
+    <<: *prod-image-builder-template
+    command: >
+      build --var-file=packer/br-node4.pkrvars.hcl packer/
+  prod-node5-image-builder:
+    <<: *prod-image-builder-template
+    command: >
+      build --var-file=packer/br-node5.pkrvars.hcl packer/
+  prod-node6-image-builder:
+    <<: *prod-image-builder-template
+    command: >
+      build --var-file=packer/br-node6.pkrvars.hcl packer/
+  prod-external1-image-builder:
+    <<: *prod-image-builder-template
+    command: >
+      build --var-file=packer/br-external1.pkrvars.hcl packer/

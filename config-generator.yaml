@@ -1,0 +1,8 @@
+services:
+  prod-cloud-config-generator:
+    build:
+      context: ./cloud-init
+    environment:
+      OP_CONNECT_TOKEN: ${OP_PROD_CONNECT_TOKEN}
+      OP_CONNECT_HOST: http://op-connect-api:8080
+      SERVER_ENV: prod

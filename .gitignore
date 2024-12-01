@@ -1,4 +1,13 @@
-.idea/
-generated/
-*.iml
+### system ###
 .DS_Store
+
+### idea ###
+.idea/
+*.iml
+
+### projects ###
+/.generated/
+.secret/.connect_token
+.secret/1password-credentials.json
+cloud-init/.generated
+/.env

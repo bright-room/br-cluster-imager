@@ -1,129 +1,89 @@
-x-cloud-config-generator-gateway-template: &cloud-config-generator-gateway-template
-  image: ghcr.io/bright-room/br-cloud-config-generator:0.2.1
-  platform: linux/amd64
-  volumes:
-    - ./credentials/gateway:/credentials
-    - ./generated/cloud-config:/generated
-  profiles:
-    - generate-cloud-config
-
-x-cloud-config-generator-nodes-template: &cloud-config-generator-nodes-template
-  image: ghcr.io/bright-room/br-cloud-config-generator:0.2.1
-  platform: linux/amd64
-  volumes:
-    - ./credentials/nodes:/credentials
-    - ./generated/cloud-config:/generated
-  profiles:
-    - generate-cloud-config
-
-x-cloud-config-generator-external-template: &cloud-config-generator-external-template
-  image: ghcr.io/bright-room/br-cloud-config-generator:0.2.1
-  platform: linux/amd64
-  volumes:
-    - ./credentials/external:/credentials
-    - ./generated/cloud-config:/generated
-  profiles:
-    - generate-cloud-config
-
-x-image-builder-template: &image-builder-template
-  image: mkaczanowski/packer-builder-arm:latest
-  volumes:
-    - /dev:/dev
-    - ./generated/cloud-config:/build/cloud-config
-    - ./generated/.packer_cache:/build/.packer_cache
-    - ./generated/images:/build/generated
-    - ./packer:/build/packer
-  command: >
-    build --var-file=packer/br-gateway1.pkrvars.hcl packer/
-  privileged: true
-
 services:
-  cloud-config-gateway1-generator:
-    <<: *cloud-config-generator-gateway-template
-    environment:
-      SERVER_NAME: br-gateway1
-  cloud-config-gateway2-generator:
-    <<: *cloud-config-generator-gateway-template
-    environment:
-      SERVER_NAME: br-gateway2
+  op-connect-api:
+    extends:
+      service: op-connect-api
+      file: ./onepassword-connect.yaml
+    volumes:
+      - data:/home/opuser/.op/data
+    profiles:
+      - pre-setup
+      - clean
+  op-connect-sync:
+    extends:
+      service: op-connect-sync
+      file: ./onepassword-connect.yaml
+    volumes:
+      - data:/home/opuser/.op/data
+    profiles:
+      - pre-setup
+      - clean
 
-  cloud-config-node1-generator:
-    <<: *cloud-config-generator-nodes-template
-    environment:
-      SERVER_NAME: br-node1
-  cloud-config-node2-generator:
-    <<: *cloud-config-generator-nodes-template
-    environment:
-      SERVER_NAME: br-node2
-  cloud-config-node3-generator:
-    <<: *cloud-config-generator-nodes-template
-    environment:
-      SERVER_NAME: br-node3
-  cloud-config-node4-generator:
-    <<: *cloud-config-generator-nodes-template
-    environment:
-      SERVER_NAME: br-node4
-  cloud-config-node5-generator:
-    <<: *cloud-config-generator-nodes-template
-    environment:
-      SERVER_NAME: br-node5
-  cloud-config-node6-generator:
-    <<: *cloud-config-generator-nodes-template
-    environment:
-      SERVER_NAME: br-node6
+  prod-cloud-config-generator:
+    extends:
+      service: prod-cloud-config-generator
+      file: ./config-generator.yaml
+    volumes:
+      - ./cloud-init/.generated:/generated
+    profiles:
+      - generate-cloud-config
+      - clean
 
-  cloud-config-external1-generator:
-    <<: *cloud-config-generator-external-template
-    environment:
-      SERVER_NAME: br-external1
+  prod-gateway1-image-builder:
+    extends:
+      service: prod-gateway1-image-builder
+      file: ./image-builder.yaml
+    profiles:
+      - prod-build-image-gateway1
+      - clean
+  prod-node1-image-builder:
+    extends:
+      service: prod-node1-image-builder
+      file: ./image-builder.yaml
+    profiles:
+      - prod-build-image-node1
+      - clean
+  prod-node2-image-builder:
+    extends:
+      service: prod-node2-image-builder
+      file: ./image-builder.yaml
+    profiles:
+      - prod-build-image-node2
+      - clean
+  prod-node3-image-builder:
+    extends:
+      service: prod-node3-image-builder
+      file: ./image-builder.yaml
+    profiles:
+      - prod-build-image-node3
+      - clean
+  prod-node4-image-builder:
+    extends:
+      service: prod-node4-image-builder
+      file: ./image-builder.yaml
+    profiles:
+      - prod-build-image-node4
+      - clean
+  prod-node5-image-builder:
+    extends:
+      service: prod-node5-image-builder
+      file: ./image-builder.yaml
+    profiles:
+      - prod-build-image-node5
+      - clean
+  prod-node6-image-builder:
+    extends:
+      service: prod-node6-image-builder
+      file: ./image-builder.yaml
+    profiles:
+      - prod-build-image-node6
+      - clean
+  prod-external1-image-builder:
+    extends:
+      service: prod-external1-image-builder
+      file: ./image-builder.yaml
+    profiles:
+      - prod-build-image-external1
+      - clean
 
-  image-builder-gateway1:
-    <<: *image-builder-template
-    command: >
-      build --var-file=packer/br-gateway1.pkrvars.hcl packer/
-    profiles:
-      - build-image-gateway1
-
-  image-builder-node1:
-    <<: *image-builder-template
-    command: >
-      build --var-file=packer/br-node1.pkrvars.hcl packer/
-    profiles:
-      - build-image-node1
-  image-builder-node2:
-    <<: *image-builder-template
-    command: >
-      build --var-file=packer/br-node2.pkrvars.hcl packer/
-    profiles:
-      - build-image-node2
-  image-builder-node3:
-    <<: *image-builder-template
-    command: >
-      build --var-file=packer/br-node3.pkrvars.hcl packer/
-    profiles:
-      - build-image-node3
-  image-builder-node4:
-    <<: *image-builder-template
-    command: >
-      build --var-file=packer/br-node4.pkrvars.hcl packer/
-    profiles:
-      - build-image-node4
-  image-builder-node5:
-    <<: *image-builder-template
-    command: >
-      build --var-file=packer/br-node5.pkrvars.hcl packer/
-    profiles:
-      - build-image-node5
-  image-builder-node6:
-    <<: *image-builder-template
-    command: >
-      build --var-file=packer/br-node6.pkrvars.hcl packer/
-    profiles:
-      - build-image-node6
-
-  image-builder-external1:
-    <<: *image-builder-template
-    command: >
-      build --var-file=packer/br-external1.pkrvars.hcl packer/
-    profiles:
-      - build-image-external1
+volumes:
+  data:
