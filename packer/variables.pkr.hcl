@@ -1,6 +1,6 @@
 variable "ubuntu_version" {
   type = string
-  default = "24.04.1"
+  default = "24.04.3"
 }
 
 variable "hostname" {
