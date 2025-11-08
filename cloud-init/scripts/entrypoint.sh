@@ -1,108 +1,124 @@
 #!/usr/bin/env bash
 
 set -Eeuo pipefail
-script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
+_=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
 
+: "${SERVER_ENV:?SERVER_ENV is not set}"
+
+SERVER_LIST="/opt/${SERVER_ENV}-servers"
 GENERATE_BASE_DIR="/generated/${SERVER_ENV}"
 TEMPLATE_BASE_DIR="/templates"
 OP_BASE_URI="op://br-cluster-"
 
-SERVER_LIST=(
-  "br-gateway1"
-  "br-gateway2"
-  "br-external1"
-  "br-external2"
-  "br-node1"
-  "br-node2"
-  "br-node3"
-  "br-node4"
-  "br-node5"
-  "br-node6"
-  "br-node7"
-  "br-node8"
-  "br-node9"
-  "br-node10"
-)
-
 function generate_dir() {
+  local server_name
   server_name=$1
+
   if [ ! -e "${GENERATE_BASE_DIR}/${server_name}" ]; then
     mkdir -p "${GENERATE_BASE_DIR}/${server_name}"
   fi
 }
 
 function get_secret() {
-    key=$1
-    op read "${key}"
+  local key
+  key=$1
+
+  op read "${key}"
 }
 
 function generate_user_data() {
-    server_name=$1
+  local server_name
+  local template_file_path
+  local generate_file_path
+  local hostname
+  local root_password
+  local hashed_root_password
+  local operator_username
+  local operator_password
+  local hashed_operator_password
+  local operator_pubkey
 
-    template_file_path="${TEMPLATE_BASE_DIR}/user-data.j2"
-    generate_file_path="${GENERATE_BASE_DIR}/${server_name}/user-data"
+  server_name=$1
 
-    hostname=$(get_secret "${OP_BASE_URI}${SERVER_ENV}/${server_name}/hostname")
+  template_file_path="${TEMPLATE_BASE_DIR}/user-data.j2"
+  generate_file_path="${GENERATE_BASE_DIR}/${server_name}/user-data"
 
-    root_password=$(get_secret "${OP_BASE_URI}${SERVER_ENV}/${server_name}/admin_console/admin_password")
-    hashed_root_password=$(openssl passwd -6 -salt=salt "${root_password}")
+  hostname=$(get_secret "${OP_BASE_URI}${SERVER_ENV}/${server_name}/hostname")
 
-    operator_username=$(get_secret "${OP_BASE_URI}${SERVER_ENV}/${server_name}/username")
+  root_password=$(get_secret "${OP_BASE_URI}${SERVER_ENV}/${server_name}/admin_console/admin_password")
+  hashed_root_password=$(openssl passwd -6 -salt=salt "${root_password}")
 
-    operator_password=$(get_secret "${OP_BASE_URI}${SERVER_ENV}/${server_name}/password")
-    hashed_operator_password=$(openssl passwd -6 -salt=salt "${operator_password}")
+  operator_username=$(get_secret "${OP_BASE_URI}${SERVER_ENV}/${server_name}/username")
 
-    operator_pubkey=$(get_secret "${OP_BASE_URI}${SERVER_ENV}/${server_name}_ssh/public key")
+  operator_password=$(get_secret "${OP_BASE_URI}${SERVER_ENV}/${server_name}/password")
+  hashed_operator_password=$(openssl passwd -6 -salt=salt "${operator_password}")
 
-    GENERATE_TARGET="gateway"
-    if [[ ${server_name} =~ ^.*node.+$ ]]; then
-      GENERATE_TARGET="node"
-    fi
-    if [[ ${server_name} =~ ^.*external.+$ ]]; then
-          GENERATE_TARGET="external"
-        fi
-    export GENERATE_TARGET
+  operator_pubkey=$(get_secret "${OP_BASE_URI}${SERVER_ENV}/${server_name}_ssh/public key")
 
-    jinja2 ${template_file_path} \
-      -D "hostname=${hostname}" \
-      -D "root_password=${hashed_root_password}" \
-      -D "operator_username=${operator_username}" \
-      -D "operator_password=${hashed_operator_password}" \
-      -D "operator_pubkey=${operator_pubkey}" \
-      > ${generate_file_path}
+  GENERATE_TARGET="gateway"
+  if [[ ${server_name} =~ ^.*node.+$ ]]; then
+    GENERATE_TARGET="node"
+  fi
+  if [[ ${server_name} =~ ^.*external.+$ ]]; then
+    GENERATE_TARGET="external"
+  fi
+  export GENERATE_TARGET
+
+  jinja2 "${template_file_path}" \
+    -D "hostname=${hostname}" \
+    -D "root_password=${hashed_root_password}" \
+    -D "operator_username=${operator_username}" \
+    -D "operator_password=${hashed_operator_password}" \
+    -D "operator_pubkey=${operator_pubkey}" \
+    > "${generate_file_path}"
 }
 
 function generate_network_config() {
-    server_name=$1
+  local server_name
+  local template_file_path
+  local generate_file_path
+  local internal_ip
+  local external_ip
+  local gateway_ip
+  local ssid
+  local passphrase
+  local hashed_passphrase
 
-    template_file_path="${TEMPLATE_BASE_DIR}/network-config.j2"
-    generate_file_path="${GENERATE_BASE_DIR}/${server_name}/network-config"
+  server_name=$1
 
-    internal_ip=$(get_secret "${OP_BASE_URI}${SERVER_ENV}/${server_name}/ip_address")
-    external_ip=$(get_secret "${OP_BASE_URI}${SERVER_ENV}/${server_name}/admin_console/external_ip_address")
-    gateway_ip=$(get_secret "${OP_BASE_URI}${SERVER_ENV}/home_wifi/GatewayIP")
+  template_file_path="${TEMPLATE_BASE_DIR}/network-config.j2"
+  generate_file_path="${GENERATE_BASE_DIR}/${server_name}/network-config"
 
-    ssid=$(get_secret "${OP_BASE_URI}${SERVER_ENV}/home_wifi/network_name")
-    passphrase=$(get_secret "${OP_BASE_URI}${SERVER_ENV}/home_wifi/wireless_password")
-    wpa_passphrase "${ssid}" "${passphrase}" > /tmp/wpa_config.txt
-    hashed_passphrase=$(cat /tmp/wpa_config.txt | sed -E 's/^[ \t]+//' | grep -E '^psk=' | cut -d'=' -f 2)
+  internal_ip=$(get_secret "${OP_BASE_URI}${SERVER_ENV}/${server_name}/ip_address")
+  external_ip=$(get_secret "${OP_BASE_URI}${SERVER_ENV}/${server_name}/admin_console/external_ip_address")
+  gateway_ip=$(get_secret "${OP_BASE_URI}${SERVER_ENV}/home_wifi/GatewayIP")
 
-    jinja2 ${template_file_path} \
-      -D internal_ip=${internal_ip} \
-      -D ssid=${ssid} \
-      -D passphrase=${hashed_passphrase} \
-      -D external_ip=${external_ip} \
-      -D gateway_ip=${gateway_ip} \
-      > ${generate_file_path}
+  ssid=$(get_secret "${OP_BASE_URI}${SERVER_ENV}/home_wifi/network_name")
+  passphrase=$(get_secret "${OP_BASE_URI}${SERVER_ENV}/home_wifi/wireless_password")
+  hashed_passphrase=$(wpa_passphrase "${ssid}" "${passphrase}" | awk '/^\s*psk=/ {gsub(/^\s*psk=/, ""); print}')
+
+  jinja2 "${template_file_path}" \
+    -D "internal_ip=${internal_ip}" \
+    -D "ssid=${ssid}" \
+    -D "passphrase=${hashed_passphrase}" \
+    -D "external_ip=${external_ip}" \
+    -D "gateway_ip=${gateway_ip}" \
+    > "${generate_file_path}"
 }
 
 ### main ###
-mkdir -p ${GENERATE_BASE_DIR}
+mkdir -p "${GENERATE_BASE_DIR}"
 
-for server_name in ${SERVER_LIST[@]}; do
-  generate_dir "${server_name}"
-  generate_user_data "${server_name}"
-  if [[ ${server_name} =~ ^.*gateway.+$ ]];then
-    generate_network_config "${server_name}"
+if [[ ! -f ${SERVER_LIST} ]]; then
+  echo "Error: server list file not found: ${SERVER_LIST}" >&2
+  exit 1
+fi
+
+while IFS= read -r server <&3; do
+  [[ -z "${server}" ]] && continue
+  generate_dir "${server}"
+  generate_user_data "${server}"
+  if [[ ${server} =~ ^.*gateway.+$ ]]; then
+    generate_network_config "${server}"
   fi
-done
+done 3< "${SERVER_LIST}"

@@ -21,6 +21,8 @@ RUN apt-get update && \
             1password-cli
 
 COPY --chmod=755 scripts/entrypoint.sh /opt/entrypoint.sh
+COPY scripts/dev-servers /opt/dev-servers
+COPY scripts/prod-servers /opt/prod-servers
 COPY templates /templates/
 
 ENTRYPOINT [ "/opt/entrypoint.sh" ]
