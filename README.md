@@ -20,10 +20,17 @@ project-brightで利用するOSのゴールデンイメージを管理するリ�
 作成したcredentials情報は以下に格納する  
 環境毎に保管庫を分けているためそれぞれディレクトリを用意して確認証ファイルを以下のように配備する。
 
+**dev環境**
 - 1password-credentials.json
-  - `.secret/<dev or prod>/1password-credentials.json`
+  - `.secret/dev/1password-credentials.json`
 - Access token
-  - `.secret/<dev or prod>/.connect_token`にJWTトークンを貼り付ける
+  - `.secret/dev/.connect_token`にJWTトークンを貼り付ける
+
+**prod環境**
+- 1password-credentials.json
+    - `.secret/prod/1password-credentials.json`
+- Access token
+    - `.secret/prod/.connect_token`にJWTトークンを貼り付ける
 
 以下のコマンドで1password-connect群のコンテナを起動する
 
@@ -64,20 +71,8 @@ make prod/mage-build/<サーバー識別子>
 ```
 
 サーバー一覧
-- br-gateway1
-- br-gateway2
-- br-external1
-- br-external2
-- br-node1
-- br-node2
-- br-node3
-- br-node4
-- br-node5
-- br-node6
-- br-node7
-- br-node8
-- br-node9
-- br-node10
+- [dev-servers](./cloud-init/scripts/dev-servers)
+- [prod-servers](./cloud-init/scripts/prod-servers)
 
 ## Clean
 
