@@ -9,13 +9,19 @@ OP_BASE_URI="op://br-cluster-"
 
 SERVER_LIST=(
   "br-gateway1"
+  "br-gateway2"
   "br-external1"
+  "br-external2"
   "br-node1"
   "br-node2"
   "br-node3"
   "br-node4"
   "br-node5"
   "br-node6"
+  "br-node7"
+  "br-node8"
+  "br-node9"
+  "br-node10"
 )
 
 function generate_dir() {

@@ -6,8 +6,9 @@
 *.iml
 
 ### projects ###
-/.generated/
-.secret/.connect_token
-.secret/1password-credentials.json
+.generated/
+.secret/
+!.secret/dev/.gitkeep
+!.secret/prod/.gitkeep
 cloud-init/.generated
 /.env

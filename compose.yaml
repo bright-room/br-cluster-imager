@@ -1,21 +1,49 @@
 services:
-  op-connect-api:
+  dev-op-connect-api:
     extends:
-      service: op-connect-api
+      service: dev-op-connect-api
       file: ./onepassword-connect.yaml
     volumes:
-      - data:/home/opuser/.op/data
+      - dev-data:/home/opuser/.op/data
     profiles:
-      - pre-setup
+      - bootstrap
       - clean
-  op-connect-sync:
+  dev-op-connect-sync:
     extends:
-      service: op-connect-sync
+      service: dev-op-connect-sync
       file: ./onepassword-connect.yaml
     volumes:
-      - data:/home/opuser/.op/data
+      - dev-data:/home/opuser/.op/data
     profiles:
-      - pre-setup
+      - bootstrap
+      - clean
+  prod-op-connect-api:
+    extends:
+      service: prod-op-connect-api
+      file: ./onepassword-connect.yaml
+    volumes:
+      - prod-data:/home/opuser/.op/data
+    profiles:
+      - bootstrap
+      - clean
+  prod-op-connect-sync:
+    extends:
+      service: prod-op-connect-sync
+      file: ./onepassword-connect.yaml
+    volumes:
+      - prod-data:/home/opuser/.op/data
+    profiles:
+      - bootstrap
+      - clean
+
+  dev-cloud-config-generator:
+    extends:
+      service: dev-cloud-config-generator
+      file: ./config-generator.yaml
+    volumes:
+      - ./cloud-init/.generated:/generated
+    profiles:
+      - dev-generate-cloud-config
       - clean
 
   prod-cloud-config-generator:
@@ -25,7 +53,120 @@ services:
     volumes:
       - ./cloud-init/.generated:/generated
     profiles:
-      - generate-cloud-config
+      - prod-generate-cloud-config
+      - clean
+
+  dev-gateway1-image-builder:
+    extends:
+      service: dev-gateway1-image-builder
+      file: ./image-builder.yaml
+    profiles:
+      - dev-build-image
+      - dev-build-image-gateway1
+      - clean
+  dev-gateway2-image-builder:
+    extends:
+      service: dev-gateway2-image-builder
+      file: ./image-builder.yaml
+    profiles:
+      - dev-build-image
+      - dev-build-image-gateway2
+      - clean
+  dev-node1-image-builder:
+    extends:
+      service: dev-node1-image-builder
+      file: ./image-builder.yaml
+    profiles:
+      - dev-build-image
+      - dev-build-image-node1
+      - clean
+  dev-node2-image-builder:
+    extends:
+      service: dev-node2-image-builder
+      file: ./image-builder.yaml
+    profiles:
+      - dev-build-image
+      - dev-build-image-node2
+      - clean
+  dev-node3-image-builder:
+    extends:
+      service: dev-node3-image-builder
+      file: ./image-builder.yaml
+    profiles:
+      - dev-build-image
+      - dev-build-image-node3
+      - clean
+  dev-node4-image-builder:
+    extends:
+      service: dev-node4-image-builder
+      file: ./image-builder.yaml
+    profiles:
+      - dev-build-image
+      - dev-build-image-node4
+      - clean
+  dev-node5-image-builder:
+    extends:
+      service: dev-node5-image-builder
+      file: ./image-builder.yaml
+    profiles:
+      - dev-build-image
+      - dev-build-image-node5
+      - clean
+  dev-node6-image-builder:
+    extends:
+      service: dev-node6-image-builder
+      file: ./image-builder.yaml
+    profiles:
+      - dev-build-image
+      - dev-build-image-node6
+      - clean
+  dev-node7-image-builder:
+    extends:
+      service: dev-node7-image-builder
+      file: ./image-builder.yaml
+    profiles:
+      - dev-build-image
+      - dev-build-image-node7
+      - clean
+  dev-node8-image-builder:
+    extends:
+      service: dev-node8-image-builder
+      file: ./image-builder.yaml
+    profiles:
+      - dev-build-image
+      - dev-build-image-node8
+      - clean
+  dev-node9-image-builder:
+    extends:
+      service: dev-node9-image-builder
+      file: ./image-builder.yaml
+    profiles:
+      - dev-build-image
+      - dev-build-image-node9
+      - clean
+  dev-node10-image-builder:
+    extends:
+      service: dev-node10-image-builder
+      file: ./image-builder.yaml
+    profiles:
+      - dev-build-image
+      - dev-build-image-node10
+      - clean
+  dev-external1-image-builder:
+    extends:
+      service: dev-external1-image-builder
+      file: ./image-builder.yaml
+    profiles:
+      - dev-build-image
+      - dev-build-image-external1
+      - clean
+  dev-external2-image-builder:
+    extends:
+      service: dev-external2-image-builder
+      file: ./image-builder.yaml
+    profiles:
+      - dev-build-image
+      - dev-build-image-external2
       - clean
 
   prod-gateway1-image-builder:
@@ -33,13 +174,23 @@ services:
       service: prod-gateway1-image-builder
       file: ./image-builder.yaml
     profiles:
+      - prod-build-image
       - prod-build-image-gateway1
+      - clean
+  prod-gateway2-image-builder:
+    extends:
+      service: prod-gateway2-image-builder
+      file: ./image-builder.yaml
+    profiles:
+      - prod-build-image
+      - prod-build-image-gateway2
       - clean
   prod-node1-image-builder:
     extends:
       service: prod-node1-image-builder
       file: ./image-builder.yaml
     profiles:
+      - prod-build-image
       - prod-build-image-node1
       - clean
   prod-node2-image-builder:
@@ -47,6 +198,7 @@ services:
       service: prod-node2-image-builder
       file: ./image-builder.yaml
     profiles:
+      - prod-build-image
       - prod-build-image-node2
       - clean
   prod-node3-image-builder:
@@ -54,6 +206,7 @@ services:
       service: prod-node3-image-builder
       file: ./image-builder.yaml
     profiles:
+      - prod-build-image
       - prod-build-image-node3
       - clean
   prod-node4-image-builder:
@@ -61,6 +214,7 @@ services:
       service: prod-node4-image-builder
       file: ./image-builder.yaml
     profiles:
+      - prod-build-image
       - prod-build-image-node4
       - clean
   prod-node5-image-builder:
@@ -68,6 +222,7 @@ services:
       service: prod-node5-image-builder
       file: ./image-builder.yaml
     profiles:
+      - prod-build-image
       - prod-build-image-node5
       - clean
   prod-node6-image-builder:
@@ -75,15 +230,58 @@ services:
       service: prod-node6-image-builder
       file: ./image-builder.yaml
     profiles:
+      - prod-build-image
       - prod-build-image-node6
+      - clean
+  prod-node7-image-builder:
+    extends:
+      service: prod-node7-image-builder
+      file: ./image-builder.yaml
+    profiles:
+      - prod-build-image
+      - prod-build-image-node7
+      - clean
+  prod-node8-image-builder:
+    extends:
+      service: prod-node8-image-builder
+      file: ./image-builder.yaml
+    profiles:
+      - prod-build-image
+      - prod-build-image-node8
+      - clean
+  prod-node9-image-builder:
+    extends:
+      service: prod-node9-image-builder
+      file: ./image-builder.yaml
+    profiles:
+      - prod-build-image
+      - prod-build-image-node9
+      - clean
+  prod-node10-image-builder:
+    extends:
+      service: prod-node10-image-builder
+      file: ./image-builder.yaml
+    profiles:
+      - prod-build-image
+      - prod-build-image-node10
       - clean
   prod-external1-image-builder:
     extends:
       service: prod-external1-image-builder
       file: ./image-builder.yaml
     profiles:
+      - prod-build-image
       - prod-build-image-external1
+      - clean
+  prod-external2-image-builder:
+    extends:
+      service: prod-external2-image-builder
+      file: ./image-builder.yaml
+    profiles:
+      - prod-build-image
+      - prod-build-image-external2
       - clean
 
 volumes:
-  data:
+  dev-data:
+  prod-data:
