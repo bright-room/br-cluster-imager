@@ -95,7 +95,9 @@ function generate_network_config() {
 
   ssid=$(get_secret "${OP_BASE_URI}${SERVER_ENV}/home_wifi/network_name")
   passphrase=$(get_secret "${OP_BASE_URI}${SERVER_ENV}/home_wifi/wireless_password")
-  hashed_passphrase=$(wpa_passphrase "${ssid}" "${passphrase}" | awk '/^\s*psk=/ {gsub(/^\s*psk=/, ""); print}')
+
+  wpa_passphrase "${ssid}" "${passphrase}" > /tmp/wpa_config.txt
+  hashed_passphrase=$(cat /tmp/wpa_config.txt | sed -E 's/^[ \t]+//' | grep -E '^psk=' | cut -d'=' -f 2)
 
   jinja2 "${template_file_path}" \
     -D "internal_ip=${internal_ip}" \
