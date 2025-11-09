@@ -23,10 +23,6 @@ services:
     <<: *dev-image-builder-template
     command: >
       build --var-file=packer/br-gateway1.pkrvars.hcl packer/
-  dev-gateway2-image-builder:
-    <<: *dev-image-builder-template
-    command: >
-      build --var-file=packer/br-gateway2.pkrvars.hcl packer/
   dev-node1-image-builder:
     <<: *dev-image-builder-template
     command: >
@@ -51,39 +47,15 @@ services:
     <<: *dev-image-builder-template
     command: >
       build --var-file=packer/br-node6.pkrvars.hcl packer/
-  dev-node7-image-builder:
-    <<: *dev-image-builder-template
-    command: >
-      build --var-file=packer/br-node7.pkrvars.hcl packer/
-  dev-node8-image-builder:
-    <<: *dev-image-builder-template
-    command: >
-      build --var-file=packer/br-node8.pkrvars.hcl packer/
-  dev-node9-image-builder:
-    <<: *dev-image-builder-template
-    command: >
-      build --var-file=packer/br-node9.pkrvars.hcl packer/
-  dev-node10-image-builder:
-    <<: *dev-image-builder-template
-    command: >
-      build --var-file=packer/br-node10.pkrvars.hcl packer/
   dev-external1-image-builder:
     <<: *dev-image-builder-template
     command: >
       build --var-file=packer/br-external1.pkrvars.hcl packer/
-  dev-external2-image-builder:
-    <<: *dev-image-builder-template
-    command: >
-      build --var-file=packer/br-external2.pkrvars.hcl packer/
 
   prod-gateway1-image-builder:
     <<: *prod-image-builder-template
     command: >
       build --var-file=packer/br-gateway1.pkrvars.hcl packer/
-  prod-gateway2-image-builder:
-    <<: *prod-image-builder-template
-    command: >
-      build --var-file=packer/br-gateway2.pkrvars.hcl packer/
   prod-node1-image-builder:
     <<: *prod-image-builder-template
     command: >
@@ -108,27 +80,7 @@ services:
     <<: *prod-image-builder-template
     command: >
       build --var-file=packer/br-node6.pkrvars.hcl packer/
-  prod-node7-image-builder:
-    <<: *prod-image-builder-template
-    command: >
-      build --var-file=packer/br-node7.pkrvars.hcl packer/
-  prod-node8-image-builder:
-    <<: *prod-image-builder-template
-    command: >
-      build --var-file=packer/br-node8.pkrvars.hcl packer/
-  prod-node9-image-builder:
-    <<: *prod-image-builder-template
-    command: >
-      build --var-file=packer/br-node9.pkrvars.hcl packer/
-  prod-node10-image-builder:
-    <<: *prod-image-builder-template
-    command: >
-      build --var-file=packer/br-node10.pkrvars.hcl packer/
   prod-external1-image-builder:
     <<: *prod-image-builder-template
     command: >
       build --var-file=packer/br-external1.pkrvars.hcl packer/
-  prod-external2-image-builder:
-    <<: *prod-image-builder-template
-    command: >
-      build --var-file=packer/br-external2.pkrvars.hcl packer/
