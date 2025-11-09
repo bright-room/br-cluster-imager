@@ -1,6 +1,6 @@
 # br-cluster-imager
 
-project-brightで利用するOSのゴールデンイメージを管理するリポジトリ
+Raspberry Pi on kubernetes cluster で利用するOSのゴールデンイメージを管理するリポジトリ
 
 本リポジトリではサーバー毎にcloud-configで利用するファイルを生成し、ubuntuイメージ内に取り込まれた形のイメージが作成される
 
